@@ -1,0 +1,98 @@
+/*testbook ch7 1*/
+CREATE TABLE EMP_1(
+EMP_NUM CHAR(3),
+EMP_LNAME VARCHAR(15),
+EMP_FNAME VARCHAR(15),
+EMP_INITIAL CHAR(1),
+EMP_HIREDATE DATETIME,
+JOB_CODE CHAR(3)
+);
+
+/*testbook ch7 2*/
+INSERT INTO EMP_1 VALUES('101','News','John','G','2000-11-8','502');
+INSERT INTO EMP_1 VALUES('102','Senior','David','H','1989-7-12','501');
+INSERT INTO EMP_1 VALUES('106','Smithfield','William','','2004-6-22','500');
+
+/*testbook ch7 3*/
+SELECT *
+FROM EMP_1 E1
+WHERE E1.JOB_CODE='502';
+
+/*testbook ch7 4*/
+COMMIT;
+
+/*testbook ch7 5*/
+UPDATE EMP_1
+SET JOB_CODE='501'
+WHERE EMP_NUM='107';
+
+SELECT *
+FROM EMP_1 E1
+WHERE E1.EMP_NUM='107';
+
+ROLLBACK;
+
+/*testbook ch7 6*/
+DELETE FROM EMP_1
+WHERE EMP_FNAME='William' AND EMP_LNAME='Smithfield' AND EMP_HIREDATE='2004-6-22' AND JOB_CODE='500';
+
+/*testbook ch7 7*/
+ROLLBACK;
+
+/*testbook ch7 8*/
+CREATE TABLE EMP_2 AS SELECT * FROM EMP_1;
+
+ALTER TABLE EMP_2
+ADD (EMP_PCT NUMERIC(4,2)),
+ADD (PROJ_NUM CHAR(3));
+
+
+SELECT c.CrsDesc, MIN(e.EnrGrade) AS minGrade, MAX(e.EnrGrade) AS maxGrade, AVG(e.EnrGrade) AS avgGrade, AVG(e.EnrGrade*(1.1)) AS avgPlus
+FROM Enrollment e
+INNER JOIN Offering o
+ON e.OfferNo = o.OfferNo
+INNER JOIN Course c
+ON o.CourseNo = c.CourseNo
+GROUP BY o.CourseNo
+HAVING avgGrade<3.5
+ORDER by c.CrsDesc;
+
+SELECT c.CrsDesc, MIN(e.EnrGrade) AS minGrade, MAX(e.EnrGrade) AS maxGrade, AVG(e.EnrGrade) AS avgGrade, AVG(e.EnrGrade*(1.1)) AS avgPlus
+FROM Enrollment e
+INNER JOIN Offering o
+ON e.OfferNo = o.OfferNo
+INNER JOIN Course c
+ON o.CourseNo = c.CourseNo
+WHERE o.CourseNo NOT LIKE 'IS%'
+GROUP BY o.CourseNo
+HAVING avgGrade > 3
+ORDER by c.CrsDesc;
+
+SELECT *
+FROM Student s
+CROSS JOIN Offering o, Enrollment e, Course c, Faculty f;
+
+SELECT e.OfferNo, o.OfferNo, e.StdNo, s.StdNo, o.CourseNo, c.CourseNo, o.FacNo, f.FacNo
+FROM Student s
+CROSS JOIN Offering o, Enrollment e, Course c, Faculty f;
+
+SELECT e.OfferNo, o.OfferNo, e.StdNo, s.StdNo, o.CourseNo, c.CourseNo, o.FacNo, f.FacNo
+FROM Student s
+CROSS JOIN Offering o, Enrollment e, Course c, Faculty f
+WHERE e.OfferNo=o.OfferNo
+AND e.StdNo=s.StdNo
+AND o.CourseNo=c.CourseNo
+AND o.FacNo=f.FacNo
+
+SELECT *
+FROM Enrollment e
+INNER JOIN Offering o ON e.OfferNo=o.OfferNo
+INNER JOIN Student s ON e.StdNo=s.StdNo
+INNER JOIN Course c ON o.CourseNo=c.CourseNo
+INNER JOIN Faculty f ON o.FacNo=f.FacNo;
+
+SELECT o.CourseNo, o.OfferNo, AVG(e.EnrGrade)
+FROM Enrollment AS e
+INNER JOIN Offering AS o ON e.OfferNo=o.OfferNo
+WHERE o.OffTerm='FALL' AND o.OffYear=2009 AND o.CourseNo LIKE 'IS%'
+GROUP BY o.CourseNo, o.OfferNo;
